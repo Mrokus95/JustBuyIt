@@ -2,6 +2,7 @@ from django.db import models
 from polymorphic.models import PolymorphicModel
 from django.utils.deconstruct import deconstructible
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.urls import reverse
 
 MEN = "Men"
 WOMAN = "Woman"
@@ -48,6 +49,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse("shop:products_list_by_category", args=[self.slug])
+
 
 class Product(PolymorphicModel):
     category = models.ManyToManyField(Category, related_name="products")
@@ -72,6 +76,9 @@ class Product(PolymorphicModel):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("shop:product_detail", args=[self.id, self.slug])
 
 
 @deconstructible
