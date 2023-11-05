@@ -143,6 +143,7 @@ db.sqlite3
 media
 .idea/misc.xml
 .idea/mysite.iml
+migrations
 
 # Backup files #
 *.bak

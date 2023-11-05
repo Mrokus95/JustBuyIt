@@ -7,6 +7,9 @@ from .models import Category, Product, Shoes, Tshirt, Trouser, Image, Brand
 class ImageAdmin(admin.ModelAdmin):
     list_display = ["name", "product", "main_photo", "image", "thumbnail"]
     prepopulated_fields = {"slug": ("name",)}
+    list_filter = ["name", "product", "main_photo"]
+    list_filter = ["name", "product"]
+    search_fields=["name", "product"]
 
 
 class ImageInline(admin.TabularInline):
@@ -40,23 +43,29 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Shoes)
 class ShoesAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "price", "available"]
+    list_display = ["name", "slug", "price", "available", 'created', 'updated']
     prepopulated_fields = {"slug": ("name",)}
     list_editable = ["price", "available"]
+    list_filter = ["price", "available", 'created', 'updated']
+    search_fields=['name']
     inlines = [ImageInline]
 
 
 @admin.register(Tshirt)
 class TshirtAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "price", "available"]
+    list_display = ["name", "slug", "price", "available", 'created', 'updated']
     prepopulated_fields = {"slug": ("name",)}
     list_editable = ["price", "available"]
+    list_filter = ["price", "available", 'created', 'updated']
+    search_fields=['name']
     inlines = [ImageInline]
 
 
 @admin.register(Trouser)
 class TrouserAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "price", "available"]
+    list_display = ["name", "slug", "price", "available", 'created', 'updated']
     prepopulated_fields = {"slug": ("name",)}
     list_editable = ["price", "available"]
+    list_filter = ["price", "available", 'created', 'updated']
+    search_fields=['name']
     inlines = [ImageInline]
