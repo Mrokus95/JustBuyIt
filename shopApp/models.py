@@ -3,6 +3,7 @@ from polymorphic.models import PolymorphicModel
 from django.utils.deconstruct import deconstructible
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
+from django.utils.text import slugify
 
 MEN = "Men"
 WOMAN = "Woman"
@@ -80,6 +81,10 @@ class Product(PolymorphicModel):
     def get_absolute_url(self):
         return reverse("shop:product_detail", args=[self.id, self.slug])
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 @deconstructible
 class ImagePath(object):

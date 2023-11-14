@@ -1,31 +1,47 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
-from .models import Product, Category
+from .models import Product, Category, Brand, Image
+from rest_framework import generics, viewsets, permissions, status
+from .serializers import CategoryListSerializer, ProductSerializer, WriteProductSerializer, BrandListSerializer, ImageListSerializer
+from rest_framework.response import Response
 
 
-class ProductListView(ListView):
-    template_name = "shop/product/list.html"
-    context_object_name = "products"
+class CategoryListView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategoryListSerializer
+
+class BrandListView(generics.ListAPIView):
+    queryset = Brand.objects.all()
+    serializer_class = BrandListSerializer
+
+class ImageListView(generics.ListAPIView):
+    queryset = Image.objects.all()
+    serializer_class = ImageListSerializer
+    
+class ProductViewSet(viewsets.ModelViewSet):
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrive']:
+            return ReadProductSerializer
+        return WriteProductSerializer
 
     def get_queryset(self):
-        self.category = None
-        self.categories = Category.objects.all()
-        self.products = Product.objects.filter(available=True)
-        slug = self.kwargs.get("category_slug")
-        if slug:
-            self.category = get_object_or_404(Category, slug=slug)
-            self.products = self.products.filter(category=self.category)
+        category_slug = self.kwargs.get("category_slug")
+        queryset = Product.objects.filter(available=True)
+        if category_slug:
+            category = get_object_or_404(Category, slug=category_slug)
+            queryset = queryset.filter(category=category)
+        return queryset
 
-        return self.products
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["category"] = self.category
-        context["categories"] = self.categories
-        return context
+    def retrieve(self, request, *args, **kwargs):
+        product_id = kwargs.get('pk')
+        product_slug = kwargs.get('slug')
 
-
-class ProductDetailView(DetailView):
-    model = Product
-    context_object_name = "product"
-    template_name = "shop/product/detail.html"
+        instance = get_object_or_404(Product, id=product_id, slug=product_slug)
+        serializer = ProductSerializer(instance)
+        return Response(serializer.data)
